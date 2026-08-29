@@ -24,6 +24,11 @@ adjust the Shadows, Midtones, and Highlights boundaries. The preview and the
 four exported SVG groups update immediately. **Reset thresholds** restores the
 automatically suggested boundaries for the current image.
 
+![AMS Badge Converter thresholds](images/Thresholds.png)
+
+## Download
+
+![AMS Badge Converter Download](images/Download_1.png)
 
 ## Input recommendations
 
