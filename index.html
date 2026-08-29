@@ -64,10 +64,19 @@
             <div class="preview-stage checkerboard"><img id="source-preview" alt="Original PNG preview" /></div>
           </article>
           <article class="preview-card preview-card-output">
-            <div class="card-head"><h3>MakerWorld SVG</h3><span>up to 4 color groups</span></div>
+            <div class="card-head"><h3>MakerWorld SVG</h3><span>mirrored · up to 4 color groups</span></div>
             <div class="preview-stage checkerboard"><img id="output-preview" alt="Converted SVG preview" /></div>
           </article>
         </div>
+
+        <label class="mirror-toggle" for="mirror-preview">
+          <span class="toggle-control">
+            <input id="mirror-preview" type="checkbox" checked />
+            <span class="toggle-track" aria-hidden="true"></span>
+            <strong>Show mirrored preview</strong>
+          </span>
+          <small>The downloaded SVG always stays mirrored for face-down printing.</small>
+        </label>
 
         <div class="palette-panel">
           <div>
@@ -119,7 +128,7 @@
         <h2 id="how-title">Three short steps</h2>
         <ol>
           <li><span>1</span>Upload a PNG with a transparent or clean background.</li>
-          <li><span>2</span>Review the detected palette and download the prepared SVG.</li>
+          <li><span>2</span>Review the mirrored preview and download the prepared SVG.</li>
           <li><span>3</span>Upload that SVG into Artwork SVG in MakerWorld Customize.</li>
         </ol>
       </section>

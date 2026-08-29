@@ -267,6 +267,79 @@ h1 {
   object-fit: contain;
 }
 
+#output-preview {
+  transition: transform 180ms ease;
+}
+
+#output-preview.is-unmirrored {
+  transform: scaleX(-1);
+}
+
+.mirror-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  cursor: pointer;
+}
+
+.toggle-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.toggle-control input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.toggle-track {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  flex: 0 0 auto;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper);
+}
+
+.toggle-track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ink);
+  transition: transform 160ms ease;
+}
+
+.toggle-control input:checked + .toggle-track {
+  background: var(--acid);
+}
+
+.toggle-control input:checked + .toggle-track::after {
+  transform: translateX(16px);
+}
+
+.toggle-control input:focus-visible + .toggle-track {
+  outline: 3px solid rgb(36 88 232 / 24%);
+}
+
+.mirror-toggle small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .palette-panel {
   display: flex;
   justify-content: space-between;
@@ -511,6 +584,7 @@ footer a {
   .workspace-heading,
   .palette-panel,
   .threshold-heading,
+  .mirror-toggle,
   footer {
     align-items: flex-start;
     flex-direction: column;

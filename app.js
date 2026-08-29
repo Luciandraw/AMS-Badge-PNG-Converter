@@ -16,6 +16,7 @@ const thresholdControls = document.querySelector("#threshold-controls");
 const thresholdInputs = [1, 2, 3].map((number) => document.querySelector(`#threshold-${number}`));
 const thresholdOutputs = [1, 2, 3].map((number) => document.querySelector(`#threshold-${number}-value`));
 const autoThresholdsButton = document.querySelector("#auto-thresholds");
+const mirrorPreview = document.querySelector("#mirror-preview");
 let convertedSvg = "";
 let downloadName = "makerworld.svg";
 let previewUrls = [];
@@ -195,6 +196,8 @@ resetButton.addEventListener("click", () => {
   convertedSvg = "";
   activeRaster = null;
   activeFile = null;
+  mirrorPreview.checked = true;
+  outputPreview.classList.remove("is-unmirrored");
   resultSection.hidden = true;
   revokePreviewUrls();
   setStatus("No file selected");
@@ -216,4 +219,7 @@ thresholdInputs.forEach((input, changedIndex) => input.addEventListener("input",
 autoThresholdsButton.addEventListener("click", () => {
   setThresholds(suggestedThresholds);
   scheduleConversion();
+});
+mirrorPreview.addEventListener("change", () => {
+  outputPreview.classList.toggle("is-unmirrored", !mirrorPreview.checked);
 });
