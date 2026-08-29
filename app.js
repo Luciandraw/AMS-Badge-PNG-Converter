@@ -17,6 +17,20 @@ const thresholdInputs = [1, 2, 3].map((number) => document.querySelector(`#thres
 const thresholdOutputs = [1, 2, 3].map((number) => document.querySelector(`#threshold-${number}-value`));
 const autoThresholdsButton = document.querySelector("#auto-thresholds");
 const mirrorPreview = document.querySelector("#mirror-preview");
+const imageScale = document.querySelector("#image-scale");
+const positionX = document.querySelector("#position-x");
+const positionY = document.querySelector("#position-y");
+const imageRotation = document.querySelector("#image-rotation");
+const scaleValue = document.querySelector("#scale-value");
+const positionXValue = document.querySelector("#position-x-value");
+const positionYValue = document.querySelector("#position-y-value");
+const rotationValue = document.querySelector("#rotation-value");
+const resetPlacementButton = document.querySelector("#reset-placement");
+const removeBackground = document.querySelector("#remove-background");
+const backgroundControls = document.querySelector("#background-controls");
+const backgroundColor = document.querySelector("#background-color");
+const backgroundTolerance = document.querySelector("#background-tolerance");
+const backgroundToleranceValue = document.querySelector("#background-tolerance-value");
 let convertedSvg = "";
 let downloadName = "makerworld.svg";
 let previewUrls = [];
@@ -87,6 +101,48 @@ function showPalette(colors) {
   });
 }
 
+function hexToRgb(hex) {
+  const value = hex.replace("#", "");
+  return [0, 2, 4].map((offset) => Number.parseInt(value.slice(offset, offset + 2), 16));
+}
+
+function currentPlacement() {
+  return {
+    scale: Number(imageScale.value),
+    x: Number(positionX.value),
+    y: Number(positionY.value),
+    rotation: Number(imageRotation.value),
+  };
+}
+
+function updatePlacementLabels() {
+  scaleValue.value = `${imageScale.value}%`;
+  positionXValue.value = positionX.value;
+  positionYValue.value = positionY.value;
+  rotationValue.value = `${imageRotation.value}°`;
+}
+
+function resetPlacement() {
+  imageScale.value = "100";
+  positionX.value = "0";
+  positionY.value = "0";
+  imageRotation.value = "0";
+  updatePlacementLabels();
+}
+
+function currentRasterData() {
+  if (!activeRaster) return null;
+  return removeBackground.checked
+    ? AMSConverterCore.removeEdgeBackground(
+      activeRaster.data,
+      activeRaster.width,
+      activeRaster.height,
+      hexToRgb(backgroundColor.value),
+      Number(backgroundTolerance.value),
+    )
+    : activeRaster.data;
+}
+
 function currentThresholds() {
   return thresholdInputs.map((input) => Number(input.value));
 }
@@ -114,12 +170,13 @@ function setThresholds(values) {
 
 function renderConversion() {
   if (!activeRaster || !activeFile) return;
+  const rasterData = currentRasterData();
   const result = reductionMode.value === "thresholds"
-    ? AMSConverterCore.quantizeByLuminanceThresholds(activeRaster.data, activeRaster.width, activeRaster.height, currentThresholds())
-    : AMSConverterCore.quantize(activeRaster.data, activeRaster.width, activeRaster.height, 4);
+    ? AMSConverterCore.quantizeByLuminanceThresholds(rasterData, activeRaster.width, activeRaster.height, currentThresholds())
+    : AMSConverterCore.quantize(rasterData, activeRaster.width, activeRaster.height, 4);
   const mirroredLabels = AMSConverterCore.mirrorLabelsHorizontally(result.labels, activeRaster.width, activeRaster.height);
   const paths = AMSConverterCore.pathsFromLabels(mirroredLabels, activeRaster.width, activeRaster.height, result.palette.length);
-  convertedSvg = AMSConverterCore.buildSvg(paths, result.palette, activeRaster.width, activeRaster.height);
+  convertedSvg = AMSConverterCore.buildSvg(paths, result.palette, activeRaster.width, activeRaster.height, currentPlacement());
   if (outputPreview.src.startsWith("blob:")) URL.revokeObjectURL(outputPreview.src);
   outputPreview.src = createPreviewUrl(convertedSvg, "image/svg+xml");
   showPalette(result.palette);
@@ -152,6 +209,12 @@ async function processFile(file) {
     const raster = rasterize(image);
     activeRaster = raster;
     activeFile = file;
+    resetPlacement();
+    removeBackground.checked = false;
+    backgroundControls.hidden = true;
+    backgroundColor.value = AMSConverterCore.detectEdgeColor(raster.data, raster.width, raster.height);
+    backgroundTolerance.value = "48";
+    backgroundToleranceValue.value = "48";
     suggestedThresholds = AMSConverterCore.suggestLuminanceThresholds(raster.data);
     setThresholds(suggestedThresholds);
     reductionMode.value = "smart";
@@ -198,6 +261,9 @@ resetButton.addEventListener("click", () => {
   activeFile = null;
   mirrorPreview.checked = true;
   outputPreview.classList.remove("is-unmirrored");
+  resetPlacement();
+  removeBackground.checked = false;
+  backgroundControls.hidden = true;
   resultSection.hidden = true;
   revokePreviewUrls();
   setStatus("No file selected");
@@ -217,9 +283,27 @@ thresholdInputs.forEach((input, changedIndex) => input.addEventListener("input",
   scheduleConversion();
 }));
 autoThresholdsButton.addEventListener("click", () => {
+  suggestedThresholds = AMSConverterCore.suggestLuminanceThresholds(currentRasterData());
   setThresholds(suggestedThresholds);
   scheduleConversion();
 });
 mirrorPreview.addEventListener("change", () => {
   outputPreview.classList.toggle("is-unmirrored", !mirrorPreview.checked);
+});
+[imageScale, positionX, positionY, imageRotation].forEach((input) => input.addEventListener("input", () => {
+  updatePlacementLabels();
+  scheduleConversion();
+}));
+resetPlacementButton.addEventListener("click", () => {
+  resetPlacement();
+  scheduleConversion();
+});
+removeBackground.addEventListener("change", () => {
+  backgroundControls.hidden = !removeBackground.checked;
+  scheduleConversion();
+});
+backgroundColor.addEventListener("input", scheduleConversion);
+backgroundTolerance.addEventListener("input", () => {
+  backgroundToleranceValue.value = backgroundTolerance.value;
+  scheduleConversion();
 });

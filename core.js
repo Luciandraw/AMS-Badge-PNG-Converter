@@ -16,6 +16,77 @@
     return `#${color.map((channel) => Math.max(0, Math.min(255, Math.round(channel))).toString(16).padStart(2, "0")).join("")}`;
   }
 
+  function detectEdgeColor(data, width, height, alphaThreshold = 24) {
+    const buckets = new Map();
+    const visit = (x, y) => {
+      const offset = (y * width + x) * 4;
+      if (data[offset + 3] < alphaThreshold) return;
+      const red = data[offset];
+      const green = data[offset + 1];
+      const blue = data[offset + 2];
+      const key = `${red >> 4},${green >> 4},${blue >> 4}`;
+      const bucket = buckets.get(key) || [0, 0, 0, 0];
+      bucket[0] += red;
+      bucket[1] += green;
+      bucket[2] += blue;
+      bucket[3] += 1;
+      buckets.set(key, bucket);
+    };
+    for (let x = 0; x < width; x += 1) {
+      visit(x, 0);
+      if (height > 1) visit(x, height - 1);
+    }
+    for (let y = 1; y < height - 1; y += 1) {
+      visit(0, y);
+      if (width > 1) visit(width - 1, y);
+    }
+    if (!buckets.size) return "#ffffff";
+    const winner = [...buckets.values()].sort((a, b) => b[3] - a[3])[0];
+    return colorHex([winner[0] / winner[3], winner[1] / winner[3], winner[2] / winner[3]]);
+  }
+
+  function removeEdgeBackground(data, width, height, backgroundColor, tolerance = 48) {
+    const output = new Uint8ClampedArray(data);
+    const target = backgroundColor.map(Number);
+    const maximumDistance = Math.max(0, Number(tolerance)) ** 2;
+    const visited = new Uint8Array(width * height);
+    const queue = new Int32Array(width * height);
+    let head = 0;
+    let tail = 0;
+
+    const matches = (pixel) => {
+      const offset = pixel * 4;
+      if (output[offset + 3] === 0) return true;
+      return colorDistance([output[offset], output[offset + 1], output[offset + 2]], target) <= maximumDistance;
+    };
+    const enqueue = (pixel) => {
+      if (visited[pixel] || !matches(pixel)) return;
+      visited[pixel] = 1;
+      queue[tail++] = pixel;
+    };
+
+    for (let x = 0; x < width; x += 1) {
+      enqueue(x);
+      enqueue((height - 1) * width + x);
+    }
+    for (let y = 1; y < height - 1; y += 1) {
+      enqueue(y * width);
+      enqueue(y * width + width - 1);
+    }
+
+    while (head < tail) {
+      const pixel = queue[head++];
+      const x = pixel % width;
+      const y = Math.floor(pixel / width);
+      output[pixel * 4 + 3] = 0;
+      if (x > 0) enqueue(pixel - 1);
+      if (x + 1 < width) enqueue(pixel + 1);
+      if (y > 0) enqueue(pixel - width);
+      if (y + 1 < height) enqueue(pixel + width);
+    }
+    return output;
+  }
+
   function uniquePalette(data, alphaThreshold) {
     const colors = new Map();
     for (let index = 0; index < data.length; index += 4) {
@@ -267,11 +338,13 @@
     return [...Array(colorCount - 1)].map((_, index) => index + 1).concat(4);
   }
 
-  function buildSvg(paths, palette, width, height) {
-    const scale = 100 / Math.max(width, height);
-    const offsetX = (100 - width * scale) / 2;
-    const offsetY = (100 - height * scale) / 2;
-    const transform = `translate(${offsetX.toFixed(8)} ${offsetY.toFixed(8)}) scale(${scale.toFixed(10)})`;
+  function buildSvg(paths, palette, width, height, placement = {}) {
+    const scalePercent = Number.isFinite(Number(placement.scale)) ? Number(placement.scale) : 100;
+    const positionX = Number.isFinite(Number(placement.x)) ? Number(placement.x) : 0;
+    const positionY = Number.isFinite(Number(placement.y)) ? Number(placement.y) : 0;
+    const rotation = Number.isFinite(Number(placement.rotation)) ? Number(placement.rotation) : 0;
+    const scale = (100 / Math.max(width, height)) * (scalePercent / 100);
+    const transform = `translate(${(50 + positionX).toFixed(8)} ${(50 + positionY).toFixed(8)}) rotate(${rotation.toFixed(4)}) scale(${scale.toFixed(10)}) translate(${(-width / 2).toFixed(8)} ${(-height / 2).toFixed(8)})`;
     const slots = colorSlots(paths.length);
     const groups = paths.map((path, index) => `<g id="color_${slots[index]}" fill="${palette[index]}" transform="${transform}"><path d="${path}"/></g>`).join("");
     return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="100mm" height="100mm" viewBox="0 0 100 100">${groups}</svg>`;
@@ -280,10 +353,12 @@
   global.AMSConverterCore = {
     buildSvg,
     colorSlots,
+    detectEdgeColor,
     mirrorLabelsHorizontally,
     pathsFromLabels,
     quantize,
     quantizeByLuminanceThresholds,
+    removeEdgeBackground,
     suggestLuminanceThresholds,
   };
 })(typeof globalThis === "undefined" ? window : globalThis);
