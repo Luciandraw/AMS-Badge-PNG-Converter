@@ -116,7 +116,8 @@ function renderConversion() {
   const result = reductionMode.value === "thresholds"
     ? AMSConverterCore.quantizeByLuminanceThresholds(activeRaster.data, activeRaster.width, activeRaster.height, currentThresholds())
     : AMSConverterCore.quantize(activeRaster.data, activeRaster.width, activeRaster.height, 4);
-  const paths = AMSConverterCore.pathsFromLabels(result.labels, activeRaster.width, activeRaster.height, result.palette.length);
+  const mirroredLabels = AMSConverterCore.mirrorLabelsHorizontally(result.labels, activeRaster.width, activeRaster.height);
+  const paths = AMSConverterCore.pathsFromLabels(mirroredLabels, activeRaster.width, activeRaster.height, result.palette.length);
   convertedSvg = AMSConverterCore.buildSvg(paths, result.palette, activeRaster.width, activeRaster.height);
   if (outputPreview.src.startsWith("blob:")) URL.revokeObjectURL(outputPreview.src);
   outputPreview.src = createPreviewUrl(convertedSvg, "image/svg+xml");

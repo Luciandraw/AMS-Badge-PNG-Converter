@@ -252,6 +252,16 @@
     return fragments.map((rectangles) => rectangles.map((rect) => `M${rect.x} ${rect.y}h${rect.width}v${rect.height}h-${rect.width}z`).join(""));
   }
 
+  function mirrorLabelsHorizontally(labels, width, height) {
+    const mirrored = new Int16Array(labels.length);
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        mirrored[y * width + x] = labels[y * width + (width - 1 - x)];
+      }
+    }
+    return mirrored;
+  }
+
   function colorSlots(colorCount) {
     if (colorCount <= 1) return [4];
     return [...Array(colorCount - 1)].map((_, index) => index + 1).concat(4);
@@ -270,6 +280,7 @@
   global.AMSConverterCore = {
     buildSvg,
     colorSlots,
+    mirrorLabelsHorizontally,
     pathsFromLabels,
     quantize,
     quantizeByLuminanceThresholds,
