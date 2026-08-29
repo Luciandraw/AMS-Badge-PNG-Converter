@@ -338,16 +338,22 @@
     return [...Array(colorCount - 1)].map((_, index) => index + 1).concat(4);
   }
 
-  function buildSvg(paths, palette, width, height, placement = {}) {
+  function buildSvg(paths, palette, width, height, placement = {}, viewBoxSize = 100) {
     const scalePercent = Number.isFinite(Number(placement.scale)) ? Number(placement.scale) : 100;
     const positionX = Number.isFinite(Number(placement.x)) ? Number(placement.x) : 0;
     const positionY = Number.isFinite(Number(placement.y)) ? Number(placement.y) : 0;
     const rotation = Number.isFinite(Number(placement.rotation)) ? Number(placement.rotation) : 0;
     const scale = (100 / Math.max(width, height)) * (scalePercent / 100);
     const transform = `translate(${(50 + positionX).toFixed(8)} ${(50 + positionY).toFixed(8)}) rotate(${rotation.toFixed(4)}) scale(${scale.toFixed(10)}) translate(${(-width / 2).toFixed(8)} ${(-height / 2).toFixed(8)})`;
+    const safeViewBoxSize = Number.isFinite(Number(viewBoxSize)) && Number(viewBoxSize) > 0 ? Number(viewBoxSize) : 100;
+    const viewBoxOrigin = (100 - safeViewBoxSize) / 2;
+    const defaultViewBox = Math.abs(safeViewBoxSize - 100) < 1e-9;
+    const viewBox = defaultViewBox
+      ? "0 0 100 100"
+      : `${viewBoxOrigin.toFixed(8)} ${viewBoxOrigin.toFixed(8)} ${safeViewBoxSize.toFixed(8)} ${safeViewBoxSize.toFixed(8)}`;
     const slots = colorSlots(paths.length);
     const groups = paths.map((path, index) => `<g id="color_${slots[index]}" fill="${palette[index]}" transform="${transform}"><path d="${path}"/></g>`).join("");
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="100mm" height="100mm" viewBox="0 0 100 100">${groups}</svg>`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="100mm" height="100mm" viewBox="${viewBox}" overflow="visible">${groups}</svg>`;
   }
 
   global.AMSConverterCore = {

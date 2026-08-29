@@ -349,9 +349,17 @@ h1 {
   position: absolute;
   top: 50%;
   left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.badge-artwork-frame {
+  width: 100%;
+  height: 100%;
+}
+
+.badge-safe-area {
   width: 91.176%;
   height: 91.176%;
-  transform: translate(-50%, -50%);
 }
 
 .badge-artwork-frame img {

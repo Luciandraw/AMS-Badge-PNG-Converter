@@ -1,5 +1,7 @@
 const MAX_INPUT_BYTES = 10 * 1024 * 1024;
 const MAX_RASTER_DIMENSION = 320;
+const BADGE_DIAMETER = 17;
+const ARTWORK_DIAMETER = 15.5;
 const fileInput = document.querySelector("#file-input");
 const dropZone = document.querySelector("#drop-zone");
 const status = document.querySelector("#status");
@@ -196,8 +198,17 @@ function renderConversion() {
   const mirroredLabels = AMSConverterCore.mirrorLabelsHorizontally(result.labels, activeRaster.width, activeRaster.height);
   const paths = AMSConverterCore.pathsFromLabels(mirroredLabels, activeRaster.width, activeRaster.height, result.palette.length);
   convertedSvg = AMSConverterCore.buildSvg(paths, result.palette, activeRaster.width, activeRaster.height, currentPlacement());
+  const previewViewBoxSize = 100 * BADGE_DIAMETER / ARTWORK_DIAMETER;
+  const previewSvg = AMSConverterCore.buildSvg(
+    paths,
+    result.palette,
+    activeRaster.width,
+    activeRaster.height,
+    currentPlacement(),
+    previewViewBoxSize,
+  );
   if (outputPreview.src.startsWith("blob:")) URL.revokeObjectURL(outputPreview.src);
-  outputPreview.src = createPreviewUrl(convertedSvg, "image/svg+xml");
+  outputPreview.src = createPreviewUrl(previewSvg, "image/svg+xml");
   badgeMask.style.backgroundColor = result.palette[result.palette.length - 1];
   showPalette(result.palette);
   setStatus(`Ready. ${result.palette.length} color${result.palette.length === 1 ? "" : "s"} detected.`);
