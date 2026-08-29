@@ -14,23 +14,6 @@ adjust the Shadows, Midtones, and Highlights boundaries. The preview and the
 four exported SVG groups update immediately. **Reset thresholds** restores the
 automatically suggested boundaries for the current image.
 
-## Run locally
-
-You can open `index.html` directly. To reproduce GitHub Pages behavior, serve
-this folder with any static HTTP server.
-
-## Publish with GitHub Pages
-
-1. Create a new empty GitHub repository.
-2. Upload every file from this folder to the repository root.
-3. Open **Settings → Pages**.
-4. Under **Build and deployment**, choose **Deploy from a branch**.
-5. Select `main`, choose `/ (root)`, and click **Save**.
-
-The published URL will look like `https://USERNAME.github.io/REPOSITORY/`.
-
-For fully reliable social previews, replace the relative `og.png` values in
-`index.html` with the absolute GitHub Pages image URL after publishing.
 
 ## Input recommendations
 
