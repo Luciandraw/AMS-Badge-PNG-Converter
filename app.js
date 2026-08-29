@@ -8,6 +8,7 @@ const sourceName = document.querySelector("#source-name");
 const sourceSize = document.querySelector("#source-size");
 const sourcePreview = document.querySelector("#source-preview");
 const outputPreview = document.querySelector("#output-preview");
+const badgeMask = document.querySelector("#badge-mask");
 const paletteElement = document.querySelector("#palette");
 const downloadButton = document.querySelector("#download-button");
 const resetButton = document.querySelector("#reset-button");
@@ -31,6 +32,10 @@ const backgroundControls = document.querySelector("#background-controls");
 const backgroundColor = document.querySelector("#background-color");
 const backgroundTolerance = document.querySelector("#background-tolerance");
 const backgroundToleranceValue = document.querySelector("#background-tolerance-value");
+const themeToggle = document.querySelector("#theme-toggle");
+const themeIcon = document.querySelector("#theme-icon");
+const themeLabel = document.querySelector("#theme-label");
+const themeColor = document.querySelector("#theme-color");
 let convertedSvg = "";
 let downloadName = "makerworld.svg";
 let previewUrls = [];
@@ -38,6 +43,20 @@ let activeRaster = null;
 let activeFile = null;
 let suggestedThresholds = [64, 128, 192];
 let renderFrame = 0;
+
+function applyTheme(theme, persist = true) {
+  const dark = theme === "dark";
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  themeToggle.setAttribute("aria-pressed", String(dark));
+  themeIcon.textContent = dark ? "☀" : "◐";
+  themeLabel.textContent = dark ? "Light mode" : "Dark mode";
+  themeColor.content = dark ? "#11110f" : "#f3f0e8";
+  if (persist) {
+    try { localStorage.setItem("ams-badge-theme", dark ? "dark" : "light"); } catch {}
+  }
+}
+
+applyTheme(document.documentElement.dataset.theme, false);
 
 function setStatus(message, isError = false) {
   status.textContent = message;
@@ -179,6 +198,7 @@ function renderConversion() {
   convertedSvg = AMSConverterCore.buildSvg(paths, result.palette, activeRaster.width, activeRaster.height, currentPlacement());
   if (outputPreview.src.startsWith("blob:")) URL.revokeObjectURL(outputPreview.src);
   outputPreview.src = createPreviewUrl(convertedSvg, "image/svg+xml");
+  badgeMask.style.backgroundColor = result.palette[result.palette.length - 1];
   showPalette(result.palette);
   setStatus(`Ready. ${result.palette.length} color${result.palette.length === 1 ? "" : "s"} detected.`);
 }
@@ -306,4 +326,7 @@ backgroundColor.addEventListener("input", scheduleConversion);
 backgroundTolerance.addEventListener("input", () => {
   backgroundToleranceValue.value = backgroundTolerance.value;
   scheduleConversion();
+});
+themeToggle.addEventListener("click", () => {
+  applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
 });

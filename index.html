@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Convert a PNG into a four-color SVG prepared for AMS Badge Customizer on MakerWorld." />
-    <meta name="theme-color" content="#f3f0e8" />
+    <meta id="theme-color" name="theme-color" content="#f3f0e8" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="AMS Badge · PNG to MakerWorld" />
     <meta property="og:description" content="Turn one PNG into a four-color SVG for MakerWorld Customize, entirely in your browser." />
@@ -14,16 +14,30 @@
     <meta name="twitter:description" content="Turn one PNG into a four-color SVG for MakerWorld Customize, entirely in your browser." />
     <meta name="twitter:image" content="og.png" />
     <title>AMS Badge · PNG to MakerWorld</title>
-    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css" />
+    <script>
+      (() => {
+        let savedTheme = null;
+        try { savedTheme = localStorage.getItem("ams-badge-theme"); } catch {}
+        document.documentElement.dataset.theme = savedTheme
+          || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      })();
+    </script>
+    <link rel="icon" href="favicon.svg?v=20260829c" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css?v=20260829c" />
   </head>
   <body>
     <main class="page-shell">
       <header class="hero">
-        <a class="wordmark" href="./" aria-label="AMS Badge home">
-          <span class="wordmark-mark" aria-hidden="true"></span>
-          AMS BADGE
-        </a>
+        <div class="brand-rail">
+          <a class="wordmark" href="./" aria-label="AMS Badge home">
+            <span class="wordmark-mark" aria-hidden="true"></span>
+            AMS BADGE
+          </a>
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">
+            <span id="theme-icon" class="theme-icon" aria-hidden="true">◐</span>
+            <span id="theme-label">Dark mode</span>
+          </button>
+        </div>
         <div class="hero-copy">
           <p class="eyebrow">PNG → MAKERWORLD</p>
           <h1>One image.<br />Four clean colors.</h1>
@@ -64,8 +78,16 @@
             <div class="preview-stage checkerboard"><img id="source-preview" alt="Original PNG preview" /></div>
           </article>
           <article class="preview-card preview-card-output">
-            <div class="card-head"><h3>MakerWorld SVG</h3><span>mirrored · up to 4 color groups</span></div>
-            <div class="preview-stage checkerboard"><img id="output-preview" alt="Converted SVG preview" /></div>
+            <div class="card-head"><h3>MakerWorld SVG</h3><span>Ø17 mm · mirrored</span></div>
+            <div class="preview-stage checkerboard badge-preview-stage">
+              <div id="badge-mask" class="badge-mask">
+                <div class="badge-safe-area" aria-hidden="true"></div>
+                <div class="badge-artwork-frame">
+                  <img id="output-preview" alt="Converted SVG preview inside a 17 mm circular badge" />
+                </div>
+                <span class="badge-size-label">Ø 17 mm</span>
+              </div>
+            </div>
           </article>
         </div>
 
@@ -191,7 +213,7 @@
       </footer>
     </main>
 
-    <script src="core.js" defer></script>
-    <script src="app.js" defer></script>
+    <script src="core.js?v=20260829c" defer></script>
+    <script src="app.js?v=20260829c" defer></script>
   </body>
 </html>

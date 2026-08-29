@@ -8,8 +8,29 @@
   --blue: #2458e8;
   --white: #fffefa;
   --shadow: 0 18px 50px rgb(44 42 32 / 10%);
+  --grid-line: rgb(23 23 19 / 4%);
+  --hover-surface: #f6f8ff;
+  --checker-light: #f8f7f2;
+  --checker-dark: #e7e4da;
+  --on-acid: #171713;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #11110f;
+  --ink: #f3f0e8;
+  --muted: #aaa79e;
+  --line: #3b3a34;
+  --acid: #d8ff42;
+  --blue: #7898ff;
+  --white: #1b1b18;
+  --shadow: 0 18px 50px rgb(0 0 0 / 28%);
+  --grid-line: rgb(255 255 255 / 5%);
+  --hover-surface: #20263a;
+  --checker-light: #20201d;
+  --checker-dark: #2a2925;
 }
 
 * {
@@ -20,8 +41,8 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    linear-gradient(rgb(23 23 19 / 4%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(23 23 19 / 4%) 1px, transparent 1px),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
     var(--paper);
   background-size: 32px 32px;
 }
@@ -69,6 +90,44 @@ a {
   aspect-ratio: 1;
   border-radius: 50%;
   background: conic-gradient(var(--blue) 0 25%, var(--acid) 25% 50%, #ff6a35 50% 75%, #161612 75%);
+}
+
+.brand-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.theme-toggle {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--white);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  border-color: var(--blue);
+  outline: 3px solid rgb(36 88 232 / 24%);
+}
+
+.theme-icon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--paper);
+  background: var(--ink);
+  font-size: 15px;
 }
 
 .hero-copy {
@@ -163,7 +222,7 @@ h1 {
 .drop-zone:focus-visible,
 .drop-zone.is-dragging {
   border-color: var(--blue);
-  background: #f6f8ff;
+  background: var(--hover-surface);
   outline: none;
   transform: translateY(-2px);
 }
@@ -251,12 +310,12 @@ h1 {
 }
 
 .checkerboard {
-  background-color: #f8f7f2;
+  background-color: var(--checker-light);
   background-image:
-    linear-gradient(45deg, #e7e4da 25%, transparent 25%),
-    linear-gradient(-45deg, #e7e4da 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #e7e4da 75%),
-    linear-gradient(-45deg, transparent 75%, #e7e4da 75%);
+    linear-gradient(45deg, var(--checker-dark) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--checker-dark) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--checker-dark) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--checker-dark) 75%);
   background-position: 0 0, 0 10px, 10px -10px, -10px 0;
   background-size: 20px 20px;
 }
@@ -265,6 +324,59 @@ h1 {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.badge-preview-stage {
+  position: relative;
+}
+
+.badge-mask {
+  position: relative;
+  height: 100%;
+  max-width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow:
+    0 14px 34px rgb(23 23 19 / 18%),
+    inset 0 0 0 1px rgb(255 255 255 / 40%);
+}
+
+.badge-artwork-frame,
+.badge-safe-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 91.176%;
+  height: 91.176%;
+  transform: translate(-50%, -50%);
+}
+
+.badge-artwork-frame img {
+  display: block;
+}
+
+.badge-safe-area {
+  z-index: 2;
+  pointer-events: none;
+  border: 1px dashed rgb(23 23 19 / 28%);
+  border-radius: 50%;
+}
+
+.badge-size-label {
+  position: absolute;
+  z-index: 3;
+  right: 50%;
+  bottom: 9px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #fffefa;
+  background: rgb(23 23 19 / 82%);
+  font: 800 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  transform: translateX(50%);
+  pointer-events: none;
 }
 
 #output-preview {
@@ -341,16 +453,18 @@ h1 {
 }
 
 .control-panel {
-  margin-top: 12px;
-  padding: 22px 24px;
+  position: relative;
+  margin-top: 16px;
+  padding: 26px;
   border: 1px solid var(--line);
+  border-left: 4px solid var(--blue);
   background: var(--white);
 }
 
 .control-heading {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: end;
   gap: 30px;
 }
 
@@ -359,9 +473,13 @@ h1 {
   margin-bottom: 0;
 }
 
+.control-heading .step-label {
+  margin-bottom: 10px;
+}
+
 .control-grid {
   display: grid;
-  gap: 22px;
+  gap: 14px;
   margin-top: 24px;
   padding-top: 22px;
   border-top: 1px solid var(--line);
@@ -378,7 +496,11 @@ h1 {
 .range-control,
 .color-control {
   display: grid;
-  gap: 10px;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--paper);
   font-size: 12px;
   font-weight: 800;
 }
@@ -390,12 +512,18 @@ h1 {
 }
 
 .range-control output {
+  min-width: 48px;
+  padding: 3px 6px;
+  text-align: center;
   color: var(--blue);
+  background: var(--white);
+  border: 1px solid var(--line);
   font: 800 12px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
 .range-control input[type="range"] {
   width: 100%;
+  min-height: 22px;
   accent-color: var(--blue);
 }
 
@@ -406,6 +534,13 @@ h1 {
   border: 1px solid var(--line);
   background: var(--paper);
   cursor: pointer;
+}
+
+.control-panel .toggle-control {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  background: var(--paper);
 }
 
 .palette-panel {
@@ -507,6 +642,7 @@ h1 {
 
 .small-button:hover,
 .small-button:focus-visible {
+  color: var(--on-acid);
   background: var(--acid);
   outline: 3px solid rgb(36 88 232 / 24%);
 }
@@ -557,7 +693,7 @@ h1 {
 
 .primary-button:hover,
 .primary-button:focus-visible {
-  color: var(--ink);
+  color: var(--on-acid);
   background: var(--acid);
   outline: 3px solid rgb(36 88 232 / 24%);
 }
@@ -640,6 +776,12 @@ footer a {
     padding-top: 30px;
   }
 
+  .brand-rail {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   h1 {
     font-size: clamp(48px, 15vw, 76px);
   }
@@ -683,6 +825,10 @@ footer a {
   .placement-grid,
   .background-grid {
     grid-template-columns: 1fr;
+  }
+
+  .control-panel {
+    padding: 20px;
   }
 
   .actions {
