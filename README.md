@@ -12,6 +12,12 @@ face-down. The on-page MakerWorld SVG preview shows the mirrored result that is
 written to the downloaded file.
 
 Images are processed locally in the browser and are never uploaded to a server.
+## Uoload
+![AMS Badge Converter Upload](images/Upload_image.png)
+
+## Preview
+
+![AMS Badge Converter preview](images/Preview.png)
 
 For PNGs with gradients or many source colors, choose **Manual thresholds** and
 adjust the Shadows, Midtones, and Highlights boundaries. The preview and the
