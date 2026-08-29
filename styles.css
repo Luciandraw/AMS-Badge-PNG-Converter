@@ -340,6 +340,74 @@ h1 {
   font-size: 12px;
 }
 
+.control-panel {
+  margin-top: 12px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+
+.control-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+}
+
+.control-heading .step-label,
+.control-heading .palette-help {
+  margin-bottom: 0;
+}
+
+.control-grid {
+  display: grid;
+  gap: 22px;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.placement-grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.background-grid {
+  grid-template-columns: 170px minmax(220px, 1fr);
+}
+
+.range-control,
+.color-control {
+  display: grid;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.range-control > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.range-control output {
+  color: var(--blue);
+  font: 800 12px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.range-control input[type="range"] {
+  width: 100%;
+  accent-color: var(--blue);
+}
+
+.color-control input[type="color"] {
+  width: 100%;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  cursor: pointer;
+}
+
 .palette-panel {
   display: flex;
   justify-content: space-between;
@@ -585,6 +653,7 @@ footer a {
   .palette-panel,
   .threshold-heading,
   .mirror-toggle,
+  .control-heading,
   footer {
     align-items: flex-start;
     flex-direction: column;
@@ -608,6 +677,11 @@ footer a {
   }
 
   .threshold-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .placement-grid,
+  .background-grid {
     grid-template-columns: 1fr;
   }
 

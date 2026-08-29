@@ -78,6 +78,58 @@
           <small>The downloaded SVG always stays mirrored for face-down printing.</small>
         </label>
 
+        <div class="control-panel">
+          <div class="control-heading">
+            <div>
+              <p class="step-label">IMAGE PLACEMENT</p>
+              <p class="palette-help">Scale and position the artwork inside the 17 mm badge canvas.</p>
+            </div>
+            <button id="reset-placement" class="small-button" type="button">Reset placement</button>
+          </div>
+          <div class="control-grid placement-grid">
+            <label class="range-control">
+              <span>Scale <output id="scale-value">100%</output></span>
+              <input id="image-scale" type="range" min="25" max="250" value="100" />
+            </label>
+            <label class="range-control">
+              <span>Position X <output id="position-x-value">0</output></span>
+              <input id="position-x" type="range" min="-50" max="50" value="0" />
+            </label>
+            <label class="range-control">
+              <span>Position Y <output id="position-y-value">0</output></span>
+              <input id="position-y" type="range" min="-50" max="50" value="0" />
+            </label>
+            <label class="range-control">
+              <span>Rotation <output id="rotation-value">0°</output></span>
+              <input id="image-rotation" type="range" min="-180" max="180" value="0" />
+            </label>
+          </div>
+        </div>
+
+        <div class="control-panel">
+          <div class="control-heading">
+            <div>
+              <p class="step-label">BACKGROUND REMOVAL</p>
+              <p class="palette-help">Removes matching pixels connected to the image edges while preserving enclosed details.</p>
+            </div>
+            <label class="toggle-control" for="remove-background">
+              <input id="remove-background" type="checkbox" />
+              <span class="toggle-track" aria-hidden="true"></span>
+              <strong>Remove background</strong>
+            </label>
+          </div>
+          <div id="background-controls" class="control-grid background-grid" hidden>
+            <label class="color-control">
+              <span>Background color</span>
+              <input id="background-color" type="color" value="#ffffff" />
+            </label>
+            <label class="range-control">
+              <span>Tolerance <output id="background-tolerance-value">48</output></span>
+              <input id="background-tolerance" type="range" min="0" max="150" value="48" />
+            </label>
+          </div>
+        </div>
+
         <div class="palette-panel">
           <div>
             <p class="step-label">DETECTED COLORS</p>
