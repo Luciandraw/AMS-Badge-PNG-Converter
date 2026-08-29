@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Convert a PNG into a four-color SVG prepared for AMS Badge Customizer on MakerWorld." />
+    <meta name="theme-color" content="#f3f0e8" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="AMS Badge · PNG to MakerWorld" />
+    <meta property="og:description" content="Turn one PNG into a four-color SVG for MakerWorld Customize, entirely in your browser." />
+    <meta property="og:image" content="og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AMS Badge · PNG to MakerWorld" />
+    <meta name="twitter:description" content="Turn one PNG into a four-color SVG for MakerWorld Customize, entirely in your browser." />
+    <meta name="twitter:image" content="og.png" />
+    <title>AMS Badge · PNG to MakerWorld</title>
+    <link rel="icon" href="og.png" type="image/png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="hero">
+        <a class="wordmark" href="./" aria-label="AMS Badge home">
+          <span class="wordmark-mark" aria-hidden="true"></span>
+          AMS BADGE
+        </a>
+        <div class="hero-copy">
+          <p class="eyebrow">PNG → MAKERWORLD</p>
+          <h1>One image.<br />Four clean colors.</h1>
+          <p class="lead">Upload a PNG and download an SVG prepared for AMS Badge Customizer. Your image never leaves this browser.</p>
+        </div>
+      </header>
+
+      <section class="workspace" aria-labelledby="workspace-title">
+        <div class="workspace-heading">
+          <div>
+            <p class="step-label">STEP 01</p>
+            <h2 id="workspace-title">Upload your PNG</h2>
+          </div>
+          <p class="format-note">PNG only · up to 10 MB</p>
+        </div>
+
+        <input id="file-input" type="file" accept="image/png,.png" hidden />
+        <button id="drop-zone" class="drop-zone" type="button">
+          <span class="drop-icon" aria-hidden="true">↗</span>
+          <span class="drop-title">Drop your PNG here</span>
+          <span class="drop-subtitle">or click to choose a file</span>
+        </button>
+        <div id="status" class="status" role="status" aria-live="polite">No file selected</div>
+      </section>
+
+      <section id="result-section" class="result" hidden aria-labelledby="result-title">
+        <div class="workspace-heading">
+          <div>
+            <p class="step-label">STEP 02</p>
+            <h2 id="result-title">Review the conversion</h2>
+          </div>
+          <p id="source-name" class="format-note"></p>
+        </div>
+
+        <div class="preview-grid">
+          <article class="preview-card">
+            <div class="card-head"><h3>Original PNG</h3><span id="source-size"></span></div>
+            <div class="preview-stage checkerboard"><img id="source-preview" alt="Original PNG preview" /></div>
+          </article>
+          <article class="preview-card preview-card-output">
+            <div class="card-head"><h3>MakerWorld SVG</h3><span>up to 4 color groups</span></div>
+            <div class="preview-stage checkerboard"><img id="output-preview" alt="Converted SVG preview" /></div>
+          </article>
+        </div>
+
+        <div class="palette-panel">
+          <div>
+            <p class="step-label">DETECTED COLORS</p>
+            <p class="palette-help">Darkest to lightest · color_4 is the backing color</p>
+          </div>
+          <div id="palette" class="palette" aria-label="Detected colors"></div>
+        </div>
+
+        <div class="threshold-panel">
+          <div class="threshold-heading">
+            <div>
+              <p class="step-label">COLOR THRESHOLDS</p>
+              <p class="palette-help">Use manual brightness bands when the PNG contains gradients or many colors.</p>
+            </div>
+            <label class="mode-control" for="reduction-mode">
+              <span>Reduction mode</span>
+              <select id="reduction-mode">
+                <option value="smart">Smart colors</option>
+                <option value="thresholds">Manual thresholds</option>
+              </select>
+            </label>
+          </div>
+          <div id="threshold-controls" class="threshold-controls" hidden>
+            <label>
+              <span>Shadows <output id="threshold-1-value">64</output></span>
+              <input id="threshold-1" type="range" min="1" max="253" value="64" />
+            </label>
+            <label>
+              <span>Midtones <output id="threshold-2-value">128</output></span>
+              <input id="threshold-2" type="range" min="2" max="254" value="128" />
+            </label>
+            <label>
+              <span>Highlights <output id="threshold-3-value">192</output></span>
+              <input id="threshold-3" type="range" min="3" max="255" value="192" />
+            </label>
+            <button id="auto-thresholds" class="small-button" type="button">Reset thresholds</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="download-button" class="primary-button" type="button">Download for MakerWorld <span aria-hidden="true">↓</span></button>
+          <button id="reset-button" class="text-button" type="button">Choose another PNG</button>
+        </div>
+      </section>
+
+      <section class="how-it-works" aria-labelledby="how-title">
+        <p class="step-label">HOW IT WORKS</p>
+        <h2 id="how-title">Three short steps</h2>
+        <ol>
+          <li><span>1</span>Upload a PNG with a transparent or clean background.</li>
+          <li><span>2</span>Review the detected palette and download the prepared SVG.</li>
+          <li><span>3</span>Upload that SVG into Artwork SVG in MakerWorld Customize.</li>
+        </ol>
+      </section>
+
+      <footer>
+        <p>No server uploads. All processing happens locally on your device.</p>
+        <a href="https://makerworld.com/en/makerlab/parametricModelMaker" target="_blank" rel="noreferrer">Open MakerWorld ↗</a>
+      </footer>
+    </main>
+
+    <script src="core.js" defer></script>
+    <script src="app.js" defer></script>
+  </body>
+</html>
