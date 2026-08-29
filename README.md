@@ -7,6 +7,10 @@ lightest, creates SVG groups named `color_1` through `color_4`, and normalizes
 the result to `viewBox="0 0 100 100"`. The lightest detected color becomes
 `color_4`, matching the default backing material in AMS Badge Customizer.
 
+The exported artwork is mirrored horizontally because the badge is printed
+face-down. The on-page MakerWorld SVG preview shows the mirrored result that is
+written to the downloaded file.
+
 Images are processed locally in the browser and are never uploaded to a server.
 
 For PNGs with gradients or many source colors, choose **Manual thresholds** and
