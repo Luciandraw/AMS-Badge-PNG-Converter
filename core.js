@@ -356,7 +356,23 @@
     return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="100mm" height="100mm" viewBox="${viewBox}" overflow="visible">${groups}</svg>`;
   }
 
+  function buildMakerWorldSvg(paths, palette, width, height, placement = {}) {
+    const scalePercent = Number.isFinite(Number(placement.scale)) ? Number(placement.scale) : 100;
+    const positionX = Number.isFinite(Number(placement.x)) ? Number(placement.x) : 0;
+    const positionY = Number.isFinite(Number(placement.y)) ? Number(placement.y) : 0;
+    const rotation = Number.isFinite(Number(placement.rotation)) ? Number(placement.rotation) : 0;
+    const scale = (100 / Math.max(width, height)) * (scalePercent / 100);
+    const transform = `translate(${(50 + positionX).toFixed(8)} ${(50 + positionY).toFixed(8)}) rotate(${rotation.toFixed(4)}) scale(${scale.toFixed(10)}) translate(${(-width / 2).toFixed(8)} ${(-height / 2).toFixed(8)})`;
+    const slots = colorSlots(paths.length);
+    const cells = paths.map((path, index) => {
+      const cellX = (slots[index] - 1) * 100;
+      return `<g transform="translate(${cellX} 0)"><g fill="${palette[index]}" transform="${transform}"><path d="${path}"/></g></g>`;
+    }).join("");
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="400mm" height="100mm" viewBox="0 0 400 100">${cells}</svg>`;
+  }
+
   global.AMSConverterCore = {
+    buildMakerWorldSvg,
     buildSvg,
     colorSlots,
     detectEdgeColor,

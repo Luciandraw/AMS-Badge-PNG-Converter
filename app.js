@@ -197,7 +197,13 @@ function renderConversion() {
     : AMSConverterCore.quantize(rasterData, activeRaster.width, activeRaster.height, 4);
   const mirroredLabels = AMSConverterCore.mirrorLabelsHorizontally(result.labels, activeRaster.width, activeRaster.height);
   const paths = AMSConverterCore.pathsFromLabels(mirroredLabels, activeRaster.width, activeRaster.height, result.palette.length);
-  convertedSvg = AMSConverterCore.buildSvg(paths, result.palette, activeRaster.width, activeRaster.height, currentPlacement());
+  convertedSvg = AMSConverterCore.buildMakerWorldSvg(
+    paths,
+    result.palette,
+    activeRaster.width,
+    activeRaster.height,
+    currentPlacement(),
+  );
   const previewViewBoxSize = 100 * BADGE_DIAMETER / ARTWORK_DIAMETER;
   const previewSvg = AMSConverterCore.buildSvg(
     paths,
@@ -234,7 +240,7 @@ async function processFile(file) {
     setStatus("The PNG is too large. Maximum file size is 10 MB.", true);
     return;
   }
-  setStatus("Detecting colors and building vector groups…");
+  setStatus("Detecting colors and building the four-cell SVG atlas…");
   try {
     const image = await loadImage(file);
     const raster = rasterize(image);
