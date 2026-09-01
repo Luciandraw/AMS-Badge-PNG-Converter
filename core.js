@@ -173,6 +173,60 @@
     return bestIndex;
   }
 
+  function assignFlatArtworkLabels(data, width, height, centers, alphaThreshold) {
+    const labels = new Int16Array(width * height);
+    const confident = new Uint8Array(width * height);
+    labels.fill(-1);
+
+    // Exact flat fills remain fixed. Blended antialias pixels are resolved from
+    // nearby fixed regions instead of becoming a fringe of an unrelated color.
+    const confidenceDistance = 12 * 12;
+    for (let pixel = 0; pixel < width * height; pixel += 1) {
+      const offset = pixel * 4;
+      if (data[offset + 3] < alphaThreshold) continue;
+      const source = [data[offset], data[offset + 1], data[offset + 2]];
+      const label = nearestCenter(source, centers);
+      labels[pixel] = label;
+      confident[pixel] = colorDistance(source, centers[label]) <= confidenceDistance ? 1 : 0;
+    }
+
+    const radius = 3;
+    for (let pixel = 0; pixel < labels.length; pixel += 1) {
+      if (labels[pixel] < 0 || confident[pixel]) continue;
+      const x = pixel % width;
+      const y = Math.floor(pixel / width);
+      const scores = new Float64Array(centers.length);
+      for (let dy = -radius; dy <= radius; dy += 1) {
+        const neighborY = y + dy;
+        if (neighborY < 0 || neighborY >= height) continue;
+        for (let dx = -radius; dx <= radius; dx += 1) {
+          const neighborX = x + dx;
+          if (neighborX < 0 || neighborX >= width || (!dx && !dy)) continue;
+          const neighbor = neighborY * width + neighborX;
+          if (!confident[neighbor] || labels[neighbor] < 0) continue;
+          const distance = Math.max(Math.abs(dx), Math.abs(dy));
+          scores[labels[neighbor]] += radius + 1 - distance;
+        }
+      }
+      const bestScore = Math.max(...scores);
+      if (bestScore <= 0) continue;
+      const candidates = [];
+      scores.forEach((score, label) => {
+        if (score === bestScore) candidates.push(label);
+      });
+      if (candidates.length === 1) {
+        labels[pixel] = candidates[0];
+      } else {
+        const offset = pixel * 4;
+        const source = [data[offset], data[offset + 1], data[offset + 2]];
+        labels[pixel] = candidates.reduce((best, label) => (
+          colorDistance(source, centers[label]) < colorDistance(source, centers[best]) ? label : best
+        ));
+      }
+    }
+    return labels;
+  }
+
   function quantize(data, width, height, maximumColors = 4, alphaThreshold = 24) {
     const sample = samplePixels(data, alphaThreshold);
     if (!sample.length) throw new Error("The PNG is fully transparent.");
@@ -203,12 +257,17 @@
     }
 
     centers.sort((a, b) => luminance(a) - luminance(b));
-    const labels = new Int16Array(width * height);
-    labels.fill(-1);
-    for (let pixel = 0; pixel < width * height; pixel += 1) {
-      const offset = pixel * 4;
-      if (data[offset + 3] < alphaThreshold) continue;
-      labels[pixel] = nearestCenter([data[offset], data[offset + 1], data[offset + 2]], centers);
+    let labels;
+    if (flat) {
+      labels = assignFlatArtworkLabels(data, width, height, centers, alphaThreshold);
+    } else {
+      labels = new Int16Array(width * height);
+      labels.fill(-1);
+      for (let pixel = 0; pixel < width * height; pixel += 1) {
+        const offset = pixel * 4;
+        if (data[offset + 3] < alphaThreshold) continue;
+        labels[pixel] = nearestCenter([data[offset], data[offset + 1], data[offset + 2]], centers);
+      }
     }
     return { labels, palette: centers.map((center) => colorHex(center)) };
   }
