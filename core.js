@@ -395,6 +395,39 @@
     return mirrored;
   }
 
+  function applyUxCutouts(labels, width, height, placement = {}, artworkDiameter = 15.5) {
+    const output = new Int16Array(labels);
+    const scalePercent = Number.isFinite(Number(placement.scale)) ? Number(placement.scale) : 100;
+    const positionX = Number.isFinite(Number(placement.x)) ? Number(placement.x) : 0;
+    const positionY = Number.isFinite(Number(placement.y)) ? Number(placement.y) : 0;
+    const rotation = Number.isFinite(Number(placement.rotation)) ? Number(placement.rotation) : 0;
+    const imageScale = (100 / Math.max(width, height)) * (scalePercent / 100);
+    const radians = rotation * Math.PI / 180;
+    const cosine = Math.cos(radians);
+    const sine = Math.sin(radians);
+    const unitsToMillimeters = artworkDiameter / 100;
+    const cutRadius = 2.75;
+    const cutCenters = [
+      [0, -9.25],
+      [-9.25 * Math.sqrt(3) / 2, 9.25 / 2],
+      [9.25 * Math.sqrt(3) / 2, 9.25 / 2],
+    ];
+
+    for (let pixel = 0; pixel < output.length; pixel += 1) {
+      if (output[pixel] < 0) continue;
+      const sourceX = (pixel % width) + 0.5 - width / 2;
+      const sourceY = Math.floor(pixel / width) + 0.5 - height / 2;
+      const scaledX = sourceX * imageScale;
+      const scaledY = sourceY * imageScale;
+      const finalX = (scaledX * cosine - scaledY * sine + positionX) * unitsToMillimeters;
+      const finalY = (scaledX * sine + scaledY * cosine + positionY) * unitsToMillimeters;
+      if (cutCenters.some(([cutX, cutY]) => (
+        (finalX - cutX) ** 2 + (finalY - cutY) ** 2 <= cutRadius ** 2
+      ))) output[pixel] = -1;
+    }
+    return output;
+  }
+
   function colorSlots(colorCount) {
     if (colorCount <= 1) return [4];
     return [...Array(colorCount - 1)].map((_, index) => index + 1).concat(4);
@@ -418,23 +451,8 @@
     return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="100mm" height="100mm" viewBox="${viewBox}" overflow="visible">${groups}</svg>`;
   }
 
-  function buildMakerWorldSvg(paths, palette, width, height, placement = {}) {
-    const scalePercent = Number.isFinite(Number(placement.scale)) ? Number(placement.scale) : 100;
-    const positionX = Number.isFinite(Number(placement.x)) ? Number(placement.x) : 0;
-    const positionY = Number.isFinite(Number(placement.y)) ? Number(placement.y) : 0;
-    const rotation = Number.isFinite(Number(placement.rotation)) ? Number(placement.rotation) : 0;
-    const scale = (100 / Math.max(width, height)) * (scalePercent / 100);
-    const transform = `translate(${(50 + positionX).toFixed(8)} ${(50 + positionY).toFixed(8)}) rotate(${rotation.toFixed(4)}) scale(${scale.toFixed(10)}) translate(${(-width / 2).toFixed(8)} ${(-height / 2).toFixed(8)})`;
-    const slots = colorSlots(paths.length);
-    const cells = paths.map((path, index) => {
-      const cellX = (slots[index] - 1) * 100;
-      return `<g transform="translate(${cellX} 0)"><g fill="${palette[index]}" transform="${transform}"><path d="${path}"/></g></g>`;
-    }).join("");
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="400mm" height="100mm" viewBox="0 0 400 100">${cells}</svg>`;
-  }
-
   global.AMSConverterCore = {
-    buildMakerWorldSvg,
+    applyUxCutouts,
     buildSvg,
     colorSlots,
     detectEdgeColor,

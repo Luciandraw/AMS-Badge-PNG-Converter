@@ -23,7 +23,7 @@
       })();
     </script>
     <link rel="icon" href="favicon.svg?v=20260829d" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css?v=20260829d" />
+    <link rel="stylesheet" href="styles.css?v=20260901c" />
   </head>
   <body>
     <main class="page-shell">
@@ -78,13 +78,16 @@
             <div class="preview-stage checkerboard"><img id="source-preview" alt="Original PNG preview" /></div>
           </article>
           <article class="preview-card preview-card-output">
-            <div class="card-head"><h3>MakerWorld SVG</h3><span>Ø17 mm · mirrored</span></div>
+            <div class="card-head"><h3>MakerWorld SVG</h3><span id="badge-profile-note">Round · Ø17 mm · mirrored</span></div>
             <div class="preview-stage checkerboard badge-preview-stage">
               <div id="badge-mask" class="badge-mask">
                 <div class="badge-safe-area" aria-hidden="true"></div>
                 <div class="badge-artwork-frame">
                   <img id="output-preview" alt="Converted SVG preview inside a 17 mm circular badge" />
                 </div>
+                <span class="ux-cut ux-cut-top" aria-hidden="true"></span>
+                <span class="ux-cut ux-cut-left" aria-hidden="true"></span>
+                <span class="ux-cut ux-cut-right" aria-hidden="true"></span>
                 <span class="badge-size-label">Ø 17 mm</span>
               </div>
             </div>
@@ -99,6 +102,22 @@
           </span>
           <small>The downloaded SVG always stays mirrored for face-down printing.</small>
         </label>
+
+        <div class="control-panel">
+          <div class="control-heading">
+            <div>
+              <p class="step-label">BADGE PROFILE</p>
+              <p class="palette-help">UX removes artwork inside the three open mounting cuts.</p>
+            </div>
+            <label class="mode-control" for="mounting-profile">
+              <span>Profile</span>
+              <select id="mounting-profile">
+                <option value="round">Round</option>
+                <option value="ux">UX · three cuts</option>
+              </select>
+            </label>
+          </div>
+        </div>
 
         <div class="control-panel">
           <div class="control-heading">
@@ -213,7 +232,7 @@
       </footer>
     </main>
 
-    <script src="core.js?v=20260901b" defer></script>
-    <script src="app.js?v=20260901b" defer></script>
+    <script src="core.js?v=20260901c" defer></script>
+    <script src="app.js?v=20260901c" defer></script>
   </body>
 </html>

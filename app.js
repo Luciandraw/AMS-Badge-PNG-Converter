@@ -11,6 +11,8 @@ const sourceSize = document.querySelector("#source-size");
 const sourcePreview = document.querySelector("#source-preview");
 const outputPreview = document.querySelector("#output-preview");
 const badgeMask = document.querySelector("#badge-mask");
+const badgeProfileNote = document.querySelector("#badge-profile-note");
+const mountingProfile = document.querySelector("#mounting-profile");
 const paletteElement = document.querySelector("#palette");
 const downloadButton = document.querySelector("#download-button");
 const resetButton = document.querySelector("#reset-button");
@@ -196,14 +198,17 @@ function renderConversion() {
     ? AMSConverterCore.quantizeByLuminanceThresholds(rasterData, activeRaster.width, activeRaster.height, currentThresholds())
     : AMSConverterCore.quantize(rasterData, activeRaster.width, activeRaster.height, 4);
   const mirroredLabels = AMSConverterCore.mirrorLabelsHorizontally(result.labels, activeRaster.width, activeRaster.height);
-  const paths = AMSConverterCore.pathsFromLabels(mirroredLabels, activeRaster.width, activeRaster.height, result.palette.length);
-  convertedSvg = AMSConverterCore.buildMakerWorldSvg(
-    paths,
-    result.palette,
-    activeRaster.width,
-    activeRaster.height,
-    currentPlacement(),
-  );
+  const exportLabels = mountingProfile.value === "ux"
+    ? AMSConverterCore.applyUxCutouts(
+      mirroredLabels,
+      activeRaster.width,
+      activeRaster.height,
+      currentPlacement(),
+      ARTWORK_DIAMETER,
+    )
+    : mirroredLabels;
+  const paths = AMSConverterCore.pathsFromLabels(exportLabels, activeRaster.width, activeRaster.height, result.palette.length);
+  convertedSvg = AMSConverterCore.buildSvg(paths, result.palette, activeRaster.width, activeRaster.height, currentPlacement());
   const previewViewBoxSize = 100 * BADGE_DIAMETER / ARTWORK_DIAMETER;
   const previewSvg = AMSConverterCore.buildSvg(
     paths,
@@ -216,6 +221,8 @@ function renderConversion() {
   if (outputPreview.src.startsWith("blob:")) URL.revokeObjectURL(outputPreview.src);
   outputPreview.src = createPreviewUrl(previewSvg, "image/svg+xml");
   badgeMask.style.backgroundColor = result.palette[result.palette.length - 1];
+  badgeMask.classList.toggle("is-ux", mountingProfile.value === "ux");
+  badgeProfileNote.textContent = `${mountingProfile.value === "ux" ? "UX" : "Round"} · Ø17 mm · mirrored`;
   showPalette(result.palette);
   setStatus(`Ready. ${result.palette.length} color${result.palette.length === 1 ? "" : "s"} detected.`);
 }
@@ -240,7 +247,7 @@ async function processFile(file) {
     setStatus("The PNG is too large. Maximum file size is 10 MB.", true);
     return;
   }
-  setStatus("Detecting colors and building the four-cell SVG atlas…");
+  setStatus("Detecting colors and building grouped SVG layers…");
   try {
     const image = await loadImage(file);
     const raster = rasterize(image);
@@ -300,6 +307,8 @@ resetButton.addEventListener("click", () => {
   outputPreview.classList.remove("is-unmirrored");
   resetPlacement();
   removeBackground.checked = false;
+  mountingProfile.value = "round";
+  badgeMask.classList.remove("is-ux");
   backgroundControls.hidden = true;
   resultSection.hidden = true;
   revokePreviewUrls();
@@ -339,6 +348,7 @@ removeBackground.addEventListener("change", () => {
   backgroundControls.hidden = !removeBackground.checked;
   scheduleConversion();
 });
+mountingProfile.addEventListener("change", scheduleConversion);
 backgroundColor.addEventListener("input", scheduleConversion);
 backgroundTolerance.addEventListener("input", () => {
   backgroundToleranceValue.value = backgroundTolerance.value;

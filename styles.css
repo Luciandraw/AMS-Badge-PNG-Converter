@@ -387,6 +387,45 @@ h1 {
   pointer-events: none;
 }
 
+.ux-cut {
+  position: absolute;
+  z-index: 4;
+  display: none;
+  width: 32.353%;
+  height: 32.353%;
+  border: 1px solid rgb(23 23 19 / 45%);
+  border-radius: 50%;
+  background-color: var(--checker-light);
+  background-image:
+    linear-gradient(45deg, var(--checker-dark) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--checker-dark) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--checker-dark) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--checker-dark) 75%);
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+  background-size: 20px 20px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.badge-mask.is-ux .ux-cut {
+  display: block;
+}
+
+.ux-cut-top {
+  top: -4.412%;
+  left: 50%;
+}
+
+.ux-cut-left {
+  top: 77.206%;
+  left: 2.874%;
+}
+
+.ux-cut-right {
+  top: 77.206%;
+  left: 97.126%;
+}
+
 #output-preview {
   transition: transform 180ms ease;
 }
