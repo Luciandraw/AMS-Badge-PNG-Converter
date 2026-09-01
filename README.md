@@ -19,6 +19,9 @@ Images are processed locally in the browser and are never uploaded to a server.
 
 ![AMS Badge Converter preview](images/Preview.png)
 
+## Type of cuts
+![AMS Badge Converter UX cut](images/UX_cut.png)
+
 For PNGs with gradients or many source colors, choose **Manual thresholds** and
 adjust the Shadows, Midtones, and Highlights boundaries. The preview and the
 four exported SVG groups update immediately. **Reset thresholds** restores the
