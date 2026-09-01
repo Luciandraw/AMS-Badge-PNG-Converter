@@ -124,7 +124,10 @@
     // Antialiasing creates intermediate edge shades even in genuinely flat art.
     // A wider tolerance keeps the original fill colors instead of averaging them.
     const explained = sample.filter((pixel) => Math.min(...chosen.map((color) => colorDistance(pixel, color))) <= 80 * 80).length;
-    return explained / sample.length >= 0.96 ? chosen : null;
+    // Lanczos downscaling can leave roughly 4-5% blended boundary pixels in
+    // otherwise flat artwork. Keep the dominant exact fills in that case so
+    // the spatial edge cleanup below can resolve those pixels correctly.
+    return explained / sample.length >= 0.95 ? chosen : null;
   }
 
   function samplePixels(data, alphaThreshold, maximum = 24000) {
